@@ -10,13 +10,13 @@
 - 500 g sweet potato (lower-GI binder), cooked + mashed
 - 2 eggs (bind)
 - 4 spring onions, handful parsley/dill, zest of 1 lemon
-- 50 g oatmeal or almond flour (low-GI coating, not breadcrumb)
+- 50 g chickpea flour / kikkererwtenmeel (low-GI coating, not breadcrumb)
 - Salt, pepper
 
 ## Method
 1. Poach or bake salmon 12 min, flake.
 2. Mix salmon + mashed sweet potato + egg + onion + herbs + lemon. Form 8 cakes.
-3. Roll in oatmeal/almond flour.
+3. Roll in chickpea flour.
 4. Pan-fry 3 min/side to set, OR oven-bake 200°C 20 min. Cool, freeze on a tray then bag.
 
 ## Reheat
