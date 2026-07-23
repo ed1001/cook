@@ -16,7 +16,7 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-npx --yes localtunnel --port "$PORT" --subdomain "$SUBDOMAIN" &
+"$ROOT/node_modules/.bin/lt" --port "$PORT" --subdomain "$SUBDOMAIN" &
 LT_PID=$!
 
 echo "Serving: https://$SUBDOMAIN.loca.lt   (local: http://localhost:$PORT)"

@@ -20,3 +20,6 @@ _No legume/grain in this one → lower carb than the other cores. Add a carb sid
 3. Return beef, add beer + carrots + bay + water to nearly cover.
 4. Simmer low 2–2.5 hr until beef pull-apart tender. Reduce to thicken.
 5. Cool, portion, freeze.
+
+## Reheat
+Microwave 4–5 min from frozen, or defrost overnight + 3 min. Add a splash of water if it has thickened; simmer 1 min to loosen.
