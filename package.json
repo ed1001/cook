@@ -1,0 +1,14 @@
+{
+  "name": "cook",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node bin/build.mjs",
+    "test": "node --test",
+    "serve": "bash bin/serve.sh"
+  },
+  "dependencies": {
+    "marked": "^12.0.0",
+    "localtunnel": "^2.0.2"
+  }
+}
