@@ -5,6 +5,7 @@ _Read first. The rules every recipe and cook plan must respect._
 ## Diet rules
 - Low-GI carbs only (veg, legumes, oats, fruit, whole grains). No refined sugar.
 - No boiled eggs. Other egg styles are fine.
+- Every meal must contain meat or fish. No meat-free / vegetarian meals.
 
 ## Batch / freeze philosophy
 - Recipes are cooked as big **batches** and portioned into the freezer.
