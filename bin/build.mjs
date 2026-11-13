@@ -201,6 +201,9 @@ h2::after{content:"";position:absolute;left:0;bottom:-1px;width:2.6rem;height:4p
 h3{font-family:"Hanken Grotesk",sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:.8rem;
   font-weight:800;color:var(--accent);margin:1.7rem 0 .4rem;display:flex;align-items:center;gap:.6rem}
 h3::after{content:"";flex:1;height:1px;background:var(--line);opacity:.7}
+h4{font-family:"Fraunces",serif;font-weight:700;font-size:1.2rem;letter-spacing:-.01em;line-height:1.2;
+  color:var(--ink);margin:1.5rem 0 .1rem}
+h4 + ul{margin-top:.2rem}
 p{margin:.6rem 0}
 a{color:var(--accent);text-underline-offset:3px}
 strong{font-weight:700}
@@ -230,6 +233,10 @@ body[data-view="inter"] .chips{display:none}
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;
   background:color-mix(in srgb,var(--card) 94%,transparent);backdrop-filter:blur(12px) saturate(1.2);
   border-top:2px solid var(--ink);padding:.3rem .4rem calc(.4rem + env(safe-area-inset-bottom))}
+/* iOS Safari can leave the fixed bar hovering above the screen edge while its
+   toolbar collapses mid-scroll — extend the bar's background down to fill the gap */
+.tabs::after{content:"";position:absolute;left:0;right:0;top:100%;height:120px;
+  background:color-mix(in srgb,var(--card) 94%,transparent)}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:.1rem;padding:.55rem 0 .35rem;
   background:none;border:none;cursor:pointer;color:var(--muted);position:relative;font-family:"Hanken Grotesk",sans-serif}
 .tab .tlabel{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.13em}
@@ -498,14 +505,19 @@ export function buildSite({ recipesDir, cooksDir, outDir }) {
 
   const latest = cooks[0];
   const pastCooks = cooks.slice(1);
+  const mains = recipes.filter((r) => !r.slug.startsWith('side-'));
+  const sides = recipes.filter((r) => r.slug.startsWith('side-'));
+  const cardGrid = (list) =>
+    `<div class="card-grid">${list.map((r, i) => `<a class="rcard" href="recipe-${r.slug}.html"><span class="rnum">${String(i + 1).padStart(2, '0')}</span>${r.title}</a>`).join('')}</div>`;
   const body = [
     '<section class="hero"><h1>Cook</h1><p class="tagline">Batch kitchen — recipes &amp; cook days.</p></section>',
     latest
       ? `<section><a class="cook-feature" href="cook-${latest.slug}.html"><span class="cf-label">Cooking now</span><span class="cf-title">${latest.title}</span><span class="cf-go">Open shopping list &amp; steps →</span></a></section>`
       : '<p class="empty">No cooks yet — run <strong>/cook</strong> to plan one.</p>',
-    recipes.length
-      ? `<section><h2>Recipes</h2><div class="card-grid">${recipes.map((r, i) => `<a class="rcard" href="recipe-${r.slug}.html"><span class="rnum">${String(i + 1).padStart(2, '0')}</span>${r.title}</a>`).join('')}</div></section>`
+    mains.length
+      ? `<section><h2>Recipes</h2>${cardGrid(mains)}</section>`
       : '<p class="empty">No recipes yet.</p>',
+    sides.length ? `<section><h2>Sides</h2>${cardGrid(sides)}</section>` : '',
     pastCooks.length
       ? `<section><h2>Past cooks</h2><ul class="cook-list">${pastCooks.map((c) => `<li><a href="cook-${c.slug}.html">${c.title}</a></li>`).join('')}</ul></section>`
       : '',

@@ -48,3 +48,24 @@ test('buildSite renders recipes, cooks, and an index', async () => {
   const recipe = await readFile(join(outDir, 'recipe-thai.html'), 'utf8');
   assert.match(recipe, /<h1>Thai Curry<\/h1>/);
 });
+
+test('buildSite lists side-* recipes in their own Sides section', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'cook-'));
+  const recipesDir = join(root, 'recipes');
+  const cooksDir = join(root, 'cooks');
+  const outDir = join(root, 'site');
+  await mkdir(recipesDir); await mkdir(cooksDir);
+  await writeFile(join(recipesDir, 'thai.md'), '# Thai Curry\n\nyum');
+  await writeFile(join(recipesDir, 'side-mash.md'), '# Side — Mash\n\nsoft');
+
+  buildSite({ recipesDir, cooksDir, outDir });
+
+  const files = await readdir(outDir);
+  assert.ok(files.includes('recipe-side-mash.html'));
+  const index = await readFile(join(outDir, 'index.html'), 'utf8');
+  const [mains, sides] = index.split('<h2>Sides</h2>');
+  assert.ok(sides, 'index has a Sides section');
+  assert.match(mains, /Thai Curry/);
+  assert.doesNotMatch(mains, /Mash/);
+  assert.match(sides, /Side — Mash/);
+});
