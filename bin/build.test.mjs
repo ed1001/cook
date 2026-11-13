@@ -90,9 +90,22 @@ test('buildSite copies static files into the site root', async () => {
   assert.equal(await readFile(join(dir, 'site', 'apple-touch-icon.png'), 'utf8'), 'png');
 });
 
-test('renderPage has a keep-screen-on button, hidden until wake lock is supported', () => {
+test('renderPage always shows a labelled keep-screen-on button', () => {
   const html = renderPage({ title: 'X', bodyHtml: '' });
-  assert.match(html, /<button id="wake-btn"[^>]*hidden/);
+  assert.match(html, /<button id="wake-btn"[^>]*>☀<span class="wlabel">Keep on<\/span><\/button>/);
+  assert.doesNotMatch(html, /<button id="wake-btn"[^>]*hidden/);
+  assert.match(html, /keepawake\.mp4/);
   assert.match(html, /navigator\.wakeLock/);
   assert.match(html, /cook-wake-until/);
+});
+
+test('single tildes stay literal; only double tildes strike through', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'cook-tilde-'));
+  for (const d of ['recipes', 'cooks']) await mkdir(join(dir, d));
+  await writeFile(join(dir, 'recipes', 'r.md'), '# R\n\n**Yield:** ~27 mains + ~24 sides (~13 days). Then ~~gone~~.');
+  buildSite({ recipesDir: join(dir, 'recipes'), cooksDir: join(dir, 'cooks'), outDir: join(dir, 'site') });
+  const html = await readFile(join(dir, 'site', 'recipe-r.html'), 'utf8');
+  assert.match(html, /~27 mains \+ ~24 sides \(~13 days\)/);
+  assert.doesNotMatch(html, /<del>27/);
+  assert.match(html, /<del>gone<\/del>/);
 });
