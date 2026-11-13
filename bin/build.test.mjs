@@ -89,3 +89,10 @@ test('buildSite copies static files into the site root', async () => {
   });
   assert.equal(await readFile(join(dir, 'site', 'apple-touch-icon.png'), 'utf8'), 'png');
 });
+
+test('renderPage has a keep-screen-on button, hidden until wake lock is supported', () => {
+  const html = renderPage({ title: 'X', bodyHtml: '' });
+  assert.match(html, /<button id="wake-btn"[^>]*hidden/);
+  assert.match(html, /navigator\.wakeLock/);
+  assert.match(html, /cook-wake-until/);
+});

@@ -187,6 +187,9 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opa
 .theme{font-size:1rem;line-height:1;background:none;border:1.5px solid var(--ink);color:var(--ink);
   width:2.3rem;height:2.3rem;border-radius:50%;cursor:pointer}
 .theme:active{background:var(--line2)}
+.wake{font-size:.95rem}
+.wake.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.wake.paused{border-style:dashed}
 
 main{position:relative;z-index:1;max-width:44rem;margin:0 auto;padding:1.3rem 1.1rem 4.5rem;overflow-wrap:anywhere}
 body.k-cook main,body.k-recipe main{padding-bottom:8rem}
@@ -347,6 +350,51 @@ const SCRIPT = `<script>
     localStorage.setItem('cook-theme',next);
   });}
 
+  // Keep screen on: wake lock for 2 h. The deadline lives in localStorage so it
+  // survives page-to-page navigation; the lock itself drops whenever the page is
+  // hidden or closed, so the phone always falls back to normal auto-lock.
+  var wbtn=document.getElementById('wake-btn');
+  if(wbtn && 'wakeLock' in navigator){
+    var WAKE_KEY='cook-wake-until', WAKE_MS=2*60*60*1000, lock=null, timer=null;
+    function until(){try{return parseInt(localStorage.getItem(WAKE_KEY)||'0',10);}catch(e){return 0;}}
+    function setUntil(v){try{v?localStorage.setItem(WAKE_KEY,String(v)):localStorage.removeItem(WAKE_KEY);}catch(e){}}
+    function left(){var m=Math.max(0,Math.round((until()-Date.now())/60000));return Math.floor(m/60)+':'+String(m%60).padStart(2,'0');}
+    function paint(){
+      var active=until()>Date.now();
+      wbtn.classList.toggle('on',active&&!!lock);
+      wbtn.classList.toggle('paused',active&&!lock);
+      wbtn.setAttribute('aria-pressed',active?'true':'false');
+      wbtn.title=active?(lock?'Screen stays on, '+left()+' left (tap to stop)':'Tap to resume keeping the screen on'):'Keep screen on for 2 hours';
+    }
+    function stop(){
+      setUntil(0); clearTimeout(timer);
+      if(lock){var l=lock;lock=null;l.release().catch(function(){});}
+      paint();
+    }
+    function acquire(){
+      var u=until();
+      if(u<=Date.now()){stop();return;}
+      if(lock){paint();return;}
+      navigator.wakeLock.request('screen').then(function(l){
+        lock=l;
+        l.addEventListener('release',function(){if(lock===l){lock=null;paint();}});
+        clearTimeout(timer); timer=setTimeout(stop,until()-Date.now());
+        paint();
+      }).catch(function(){lock=null;paint();});
+    }
+    wbtn.hidden=false;
+    wbtn.addEventListener('click',function(){
+      if(until()>Date.now()&&lock){stop();}
+      else{if(until()<=Date.now())setUntil(Date.now()+WAKE_MS);acquire();}
+    });
+    document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')acquire();});
+    // Re-take the lock on a new page; if the browser wants a tap first, the first tap anywhere does it.
+    acquire();
+    document.addEventListener('pointerdown',function(){if(until()>Date.now()&&!lock)acquire();},{passive:true});
+    setInterval(paint,60000);
+    paint();
+  }
+
   var body=document.body, kind=body.dataset.kind, path=location.pathname;
   var checkable=kind==='cook'||kind==='recipe';
 
@@ -465,7 +513,7 @@ ${STYLE}
 <body class="k-${kind}" data-kind="${kind}">
 <header class="topbar">
   <a class="brand" href="index.html"><span class="dot"></span>Cook</a>
-  <div class="bar-right">${back}<button id="theme-btn" class="theme" aria-label="Toggle light/dark">◐</button></div>
+  <div class="bar-right">${back}<button id="wake-btn" class="theme wake" hidden aria-pressed="false" aria-label="Keep screen on for 2 hours" title="Keep screen on">☀</button><button id="theme-btn" class="theme" aria-label="Toggle light/dark">◐</button></div>
 </header>
 <main>
 ${bodyHtml}
