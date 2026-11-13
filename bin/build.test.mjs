@@ -69,3 +69,23 @@ test('buildSite lists side-* recipes in their own Sides section', async () => {
   assert.doesNotMatch(mains, /Mash/);
   assert.match(sides, /Side — Mash/);
 });
+
+test('renderPage links the home-screen icon and runs standalone', () => {
+  const html = renderPage({ title: 'X', bodyHtml: '' });
+  assert.match(html, /<link rel="apple-touch-icon" href="apple-touch-icon.png">/);
+  assert.match(html, /<meta name="apple-mobile-web-app-capable" content="yes">/);
+  assert.match(html, /<meta name="apple-mobile-web-app-title" content="Cook">/);
+});
+
+test('buildSite copies static files into the site root', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'cook-static-'));
+  for (const d of ['recipes', 'cooks', 'static']) await mkdir(join(dir, d));
+  await writeFile(join(dir, 'static', 'apple-touch-icon.png'), 'png');
+  buildSite({
+    recipesDir: join(dir, 'recipes'),
+    cooksDir: join(dir, 'cooks'),
+    staticDir: join(dir, 'static'),
+    outDir: join(dir, 'site'),
+  });
+  assert.equal(await readFile(join(dir, 'site', 'apple-touch-icon.png'), 'utf8'), 'png');
+});

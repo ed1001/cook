@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, mkdirSync, writeFileSync, existsSync, rmSync } from 'node:fs';
+import { readdirSync, readFileSync, mkdirSync, writeFileSync, existsSync, rmSync, cpSync } from 'node:fs';
 import { join, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { marked } from 'marked';
@@ -455,6 +455,9 @@ export function renderPage({ title, bodyHtml, homeHref, kind = 'page' }) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#bd3818">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cook">
 <title>${title}</title>
 ${FONTS}
 ${STYLE}
@@ -483,12 +486,13 @@ function readDocs(dir) {
     });
 }
 
-export function buildSite({ recipesDir, cooksDir, outDir }) {
+export function buildSite({ recipesDir, cooksDir, outDir, staticDir }) {
   const recipes = readDocs(recipesDir).sort((a, b) => a.title.localeCompare(b.title));
   const cooks = readDocs(cooksDir).sort((a, b) => b.slug.localeCompare(a.slug)); // newest first
 
   if (existsSync(outDir)) rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
+  if (staticDir && existsSync(staticDir)) cpSync(staticDir, outDir, { recursive: true });
 
   for (const r of recipes) {
     writeFileSync(
@@ -537,6 +541,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const manifest = buildSite({
     recipesDir: join(root, 'recipes'),
     cooksDir: join(root, 'cooks'),
+    staticDir: join(root, 'static'),
     outDir: join(root, 'site'),
   });
   console.log(`Built ${manifest.recipes.length} recipes, ${manifest.cooks.length} cooks → site/`);
