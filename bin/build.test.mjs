@@ -90,9 +90,9 @@ test('buildSite copies static files into the site root', async () => {
   assert.equal(await readFile(join(dir, 'site', 'apple-touch-icon.png'), 'utf8'), 'png');
 });
 
-test('renderPage always shows a labelled keep-screen-on button', () => {
+test('renderPage always shows the sun keep-screen-on button', () => {
   const html = renderPage({ title: 'X', bodyHtml: '' });
-  assert.match(html, /<button id="wake-btn"[^>]*>☀<span class="wlabel">Keep on<\/span><\/button>/);
+  assert.match(html, /<button id="wake-btn"[^>]*>☀<\/button>/);
   assert.doesNotMatch(html, /<button id="wake-btn"[^>]*hidden/);
   assert.match(html, /keepawake\.mp4/);
   assert.match(html, /navigator\.wakeLock/);

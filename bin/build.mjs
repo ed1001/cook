@@ -191,13 +191,9 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opa
 .theme{font-size:1rem;line-height:1;background:none;border:1.5px solid var(--ink);color:var(--ink);
   width:2.3rem;height:2.3rem;border-radius:50%;cursor:pointer}
 .theme:active{background:var(--line2)}
-.wake{display:inline-flex;align-items:center;gap:.3rem;font:inherit;font-size:.8rem;font-weight:800;
-  text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;background:none;color:var(--ink);
-  border:1.5px solid var(--ink);border-radius:999px;padding:.45rem .7rem;cursor:pointer}
-.wake:active{background:var(--line2)}
+.wake{font-size:1.05rem}
 .wake.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .wake.paused{border-style:dashed}
-.wake .wlabel{font-variant-numeric:tabular-nums}
 
 main{position:relative;z-index:1;max-width:44rem;margin:0 auto;padding:1.3rem 1.1rem 4.5rem;overflow-wrap:anywhere}
 body.k-cook main,body.k-recipe main{padding-bottom:8rem}
@@ -366,7 +362,6 @@ const SCRIPT = `<script>
   var wbtn=document.getElementById('wake-btn');
   if(wbtn){
     var WAKE_KEY='cook-wake-until', WAKE_MS=2*60*60*1000, lock=null, vid=null, timer=null;
-    var wlabel=wbtn.querySelector('.wlabel');
     function until(){try{return parseInt(localStorage.getItem(WAKE_KEY)||'0',10);}catch(e){return 0;}}
     function setUntil(v){try{v?localStorage.setItem(WAKE_KEY,String(v)):localStorage.removeItem(WAKE_KEY);}catch(e){}}
     function active(){return until()>Date.now();}
@@ -377,7 +372,6 @@ const SCRIPT = `<script>
       wbtn.classList.toggle('on',on&&h);
       wbtn.classList.toggle('paused',on&&!h);
       wbtn.setAttribute('aria-pressed',on?'true':'false');
-      wlabel.textContent=on?(h?'On '+left():'Tap'):'Keep on';
       wbtn.title=on?(h?'Screen stays on, '+left()+' left. Tap to stop.':'Tap to resume keeping the screen on'):'Keep screen on for 2 hours';
     }
     function video(){
@@ -539,7 +533,7 @@ ${STYLE}
 <body class="k-${kind}" data-kind="${kind}">
 <header class="topbar">
   <a class="brand" href="index.html"><span class="dot"></span>Cook</a>
-  <div class="bar-right">${back}<button id="wake-btn" class="wake" aria-pressed="false" aria-label="Keep screen on for 2 hours" title="Keep screen on for 2 hours">☀<span class="wlabel">Keep on</span></button><button id="theme-btn" class="theme" aria-label="Toggle light/dark">◐</button></div>
+  <div class="bar-right">${back}<button id="wake-btn" class="theme wake" aria-pressed="false" aria-label="Keep screen on for 2 hours" title="Keep screen on for 2 hours">☀</button><button id="theme-btn" class="theme" aria-label="Toggle light/dark">◐</button></div>
 </header>
 <main>
 ${bodyHtml}
